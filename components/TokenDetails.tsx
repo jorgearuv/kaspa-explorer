@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 import type { TokenData } from '@/types/token'
 import { formatTokenAmount } from '@/utils/token'
 
