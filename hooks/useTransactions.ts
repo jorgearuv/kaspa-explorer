@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import type { Transaction } from '@/types/token'
 import { API_URL } from '@/constants/environment'
