@@ -1,17 +1,20 @@
 'use client'
 
+import { useEffect } from 'react'
+
+import { useToken } from '@/hooks/useToken'
+import { useTransactions } from '@/hooks/useTransactions'
+import type { TokenData } from '@/types/token'
 import TokenDetails from '@/components/TokenDetails'
 import SearchBar from '@/components/Searchbar'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import ThemeToggle from '@/components/ThemeToggle'
-import { useToken } from '@/hooks/useToken'
-import { useTransactions } from '@/hooks/useTransactions'
-import { useEffect } from 'react'
-import TransactionList from './TransactionList'
-import { formatTokenAmount } from '@/utils/token'
+import TransactionList from '@/components/TransactionList'
+import HoldersList from '@/components/HoldersList'
 
-interface TokenPageProps {
+interface TokenPageClientProps {
   initialToken?: string
+  initialData?: TokenData
 }
 
 function EmptyState() {
@@ -66,7 +69,7 @@ function ErrorState({ error }: { error: string }) {
   )
 }
 
-function LoadingState() {
+export function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 mt-12">
       <LoadingSpinner size="lg" />
@@ -82,13 +85,18 @@ function LoadingState() {
   )
 }
 
-export function TokenPage({ initialToken }: TokenPageProps) {
+export function TokenPageClient({
+  initialToken,
+  initialData,
+}: TokenPageClientProps) {
   const {
     tokenData,
     isLoading: tokenLoading,
     error: tokenError,
     fetchToken,
+    setTokenData,
   } = useToken()
+
   const {
     transactions,
     isLoading: txLoading,
@@ -96,20 +104,21 @@ export function TokenPage({ initialToken }: TokenPageProps) {
     fetchTransactions,
   } = useTransactions({
     ticker: tokenData?.tick || '',
-    limit: 50,
   })
 
   useEffect(() => {
-    if (initialToken) {
+    if (initialData) {
+      setTokenData(initialData)
+    } else if (initialToken) {
       fetchToken(initialToken)
     }
-  }, [initialToken])
+  }, [initialToken, initialData, fetchToken, setTokenData])
 
   useEffect(() => {
     if (tokenData?.tick) {
       fetchTransactions()
     }
-  }, [tokenData?.tick])
+  }, [tokenData?.tick, fetchTransactions])
 
   const isLoading = tokenLoading || txLoading
   const error = tokenError || txError
@@ -139,34 +148,12 @@ export function TokenPage({ initialToken }: TokenPageProps) {
           ) : tokenData ? (
             <div className="animate-fadeIn">
               <TokenDetails token={tokenData} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg rounded-lg overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      Top Holders
-                    </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Showing the largest token holders
-                    </p>
-                  </div>
-                  <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {tokenData.holder.map(holder => (
-                      <div
-                        key={holder.address}
-                        className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                            {holder.address.slice(0, 8)}...
-                            {holder.address.slice(-6)}
-                          </div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {formatTokenAmount(holder.amount, tokenData.dec)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-start">
+                <div className="h-fit">
+                  <HoldersList
+                    holders={tokenData.holder || []}
+                    decimals={tokenData.dec}
+                  />
                 </div>
                 <TransactionList transactions={transactions} />
               </div>

@@ -1,20 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import type { Transaction } from '@/types/token'
 import { API_URL } from '@/constants/environment'
 
 interface UseTransactionsProps {
   ticker: string
-  limit?: number
 }
 
-export function useTransactions({ ticker, limit = 50 }: UseTransactionsProps) {
+export function useTransactions({ ticker }: UseTransactionsProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
+    if (!ticker) return
+
     setIsLoading(true)
     setError(null)
 
@@ -43,7 +44,7 @@ export function useTransactions({ ticker, limit = 50 }: UseTransactionsProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [ticker])
 
   return {
     transactions,

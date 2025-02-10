@@ -1,7 +1,7 @@
 'use client'
 
-import { TokenPage } from '@/components/TokenPage'
+import { TokenPageClient } from '@/components/TokenPageClient'
 
 export default function Home() {
-  return <TokenPage />
+  return <TokenPageClient />
 }

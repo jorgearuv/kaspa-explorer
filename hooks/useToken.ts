@@ -46,5 +46,6 @@ export function useToken() {
     isLoading,
     error,
     fetchToken,
+    setTokenData,
   }
 }
