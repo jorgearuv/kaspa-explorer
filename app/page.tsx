@@ -9,6 +9,8 @@ import ThemeToggle from '@/components/ThemeToggle'
 import type { TokenData } from '@/types/token'
 import { API_URL } from '@/constants/environment'
 
+export const runtime = 'edge'
+
 export default function Home() {
   const [tokenData, setTokenData] = useState<TokenData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
