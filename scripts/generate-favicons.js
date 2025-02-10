@@ -1,6 +1,7 @@
 const sharp = require('sharp')
 const fs = require('fs').promises
 const path = require('path')
+const ico = require('to-ico')
 
 async function ensureDirectoryExists(dir) {
   try {
@@ -49,24 +50,31 @@ async function generateFavicons() {
     }
 
     // Generate each size
+    const pngBuffers = {}
     for (const [size, filename] of Object.entries(sizes)) {
       try {
-        await sharp(svgBuffer)
+        const buffer = await sharp(svgBuffer)
           .resize(parseInt(size), parseInt(size))
           .png()
-          .toFile(path.join(outputDir, filename))
+          .toBuffer()
+
+        // Save the file
+        await fs.writeFile(path.join(outputDir, filename), buffer)
         console.log(`✓ Generated ${filename}`)
+
+        // Store buffers for ICO generation
+        if (size === '16' || size === '32') {
+          pngBuffers[size] = buffer
+        }
       } catch (error) {
         console.error(`✗ Error generating ${filename}:`, error.message)
       }
     }
 
-    // Generate ICO file (includes multiple sizes)
+    // Generate ICO file using to-ico
     try {
-      await sharp(svgBuffer)
-        .resize(32, 32)
-        .toFormat('ico')
-        .toFile(path.join(outputDir, 'favicon.ico'))
+      const icoBuffer = await ico([pngBuffers['16'], pngBuffers['32']])
+      await fs.writeFile(path.join(outputDir, 'favicon.ico'), icoBuffer)
       console.log('✓ Generated favicon.ico')
     } catch (error) {
       console.error('✗ Error generating favicon.ico:', error.message)

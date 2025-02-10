@@ -63,34 +63,6 @@ export default function TokenDetails({ token }: TokenDetailsProps) {
           </div>
         </div>
       </div>
-
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Top Holders
-          </h4>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Showing the largest token holders
-          </p>
-        </div>
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
-          {token.holder.map(holder => (
-            <div
-              key={holder.address}
-              className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-            >
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                  {holder.address.slice(0, 12)}...{holder.address.slice(-8)}
-                </div>
-                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {formatTokenAmount(holder.amount, token.dec)}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }
