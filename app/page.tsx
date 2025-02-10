@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Metadata } from 'next'
 
 import TokenDetails from '@/components/TokenDetails'
 import SearchBar from '@/components/Searchbar'
@@ -10,6 +11,30 @@ import type { TokenData } from '@/types/token'
 import { API_URL } from '@/constants/environment'
 
 export const runtime = 'edge'
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { token?: string }
+}): Promise<Metadata> => {
+  const token = params.token?.toUpperCase()
+  if (!token) {
+    return {}
+  }
+
+  return {
+    title: `${token} Token Details`,
+    description: `View details, holders, and transactions for the ${token} token on Kaspa network.`,
+    openGraph: {
+      title: `${token} Token Details | Kaspa Token Explorer`,
+      description: `View details, holders, and transactions for the ${token} token on Kaspa network.`,
+    },
+    twitter: {
+      title: `${token} Token Details | Kaspa Token Explorer`,
+      description: `View details, holders, and transactions for the ${token} token on Kaspa network.`,
+    },
+  }
+}
 
 export default function Home() {
   const [tokenData, setTokenData] = useState<TokenData | null>(null)
