@@ -1,11 +1,7 @@
 import { notFound } from 'next/navigation'
-
 import { TokenPageClient } from '@/components/TokenPageClient'
 import { API_URL } from '@/constants/environment'
 import type { TokenData } from '@/types/token'
-interface TokenPageParams {
-  token: string
-}
 
 async function getInitialToken(ticker: string): Promise<TokenData> {
   const response = await fetch(
@@ -24,24 +20,24 @@ async function getInitialToken(ticker: string): Promise<TokenData> {
 export async function generateMetadata({
   params,
 }: {
-  params: TokenPageParams
+  params: Promise<{ token: string }>
 }) {
+  const { token } = await params
   return {
-    title: `${params.token.toUpperCase()} Token | Kaspa Explorer`,
-    description: `View details for ${params.token.toUpperCase()} token on the Kaspa network`,
+    title: `${token.toUpperCase()} Token | Kaspa Explorer`,
+    description: `View details for ${token.toUpperCase()} token on the Kaspa network`,
   }
 }
 
 export default async function TokenPage({
   params,
 }: {
-  params: { token: string }
+  params: Promise<{ token: string }>
 }) {
   try {
-    const initialData = await getInitialToken(params.token)
-    return (
-      <TokenPageClient initialToken={params.token} initialData={initialData} />
-    )
+    const { token } = await params
+    const initialData = await getInitialToken(token)
+    return <TokenPageClient initialToken={token} initialData={initialData} />
   } catch {
     notFound()
   }
